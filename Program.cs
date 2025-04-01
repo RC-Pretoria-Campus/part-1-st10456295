@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Media;
-using System.Drawing;
-
-
+using System.Text;
 
 namespace Chatbot1
 {
-    
-
     class Chatbot
     {
         static void Main()
@@ -21,7 +14,7 @@ namespace Chatbot1
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Clear(); // Apply background color to the entire console
 
-            Console.OutputEncoding = Encoding.UTF8;  
+            Console.OutputEncoding = Encoding.UTF8;
             PlayVoiceGreeting();
             DisplayAsciiArt();
             StartChatbot();
@@ -32,7 +25,7 @@ namespace Chatbot1
         {
             try
             {
-                SoundPlayer player = new SoundPlayer("Record.wav"); 
+                SoundPlayer player = new SoundPlayer("Record.wav");
                 player.Play();
             }
             catch (Exception)
@@ -48,20 +41,19 @@ namespace Chatbot1
 
             // Get console width for centering
             int consoleWidth = Console.WindowWidth;
-            string[] logoLines = new string[]
-            {
-        "//=================================//",
-        "//   CYBERSECURITY PROTECTION      //",
-        "//=================================//",
-        "//      ┌──────────────────┐       //",
-        "//      │  ████████████    │       //",
-        "//      │  ██      ██  █   │       //",
-        "//      │  ██  ██  ██ ███  │       //",
-        "//      │  ██  ██  ██  █   │       //",
-        "//      │  ████████████    │       //",
-        "//      └──────────────────┘       //",
-        "//    Secure. Encrypt. Defend.     //",
-        "//=================================//"
+            string[] logoLines = new string[] {
+                "//=================================//",
+                "//   CYBERSECURITY PROTECTION      //",
+                "//=================================//",
+                "//      ┌──────────────────┐       //",
+                "//      │  ████████████    │       //",
+                "//      │  ██      ██  █   │       //",
+                "//      │  ██  ██  ██ ███  │       //",
+                "//      │  ██  ██  ██  █   │       //",
+                "//      │  ████████████    │       //",
+                "//      └──────────────────┘       //",
+                "//    Secure. Encrypt. Defend.     //",
+                "//=================================//"
             };
 
             // Calculate padding for centering
@@ -74,13 +66,7 @@ namespace Chatbot1
             Console.ResetColor();
         }
 
-
-
-
-
-
-
-        //Starting the chatbot converstaion
+        //Starting the chatbot conversation
         static void StartChatbot()
         {
             Console.Write("Hello! What's your name? ");
@@ -104,21 +90,30 @@ namespace Chatbot1
                 Console.Write("\nYou: ");
                 string userInput = Console.ReadLine().ToLower();
 
+                // Clean the user input by removing punctuation marks (such as ?, !!!)
+                userInput = Regex.Replace(userInput, @"[^\w\s]", ""); // This removes any character that isn't a word or space
+
                 if (string.IsNullOrWhiteSpace(userInput))
                 {
                     Console.WriteLine("Bot: I didn't quite understand that. Could you rephrase?");
                     continue;
                 }
 
-                switch (userInput)
+                switch (userInput)  // Convert user input to lowercase for case-insensitive comparison
                 {
                     case "how are you":
                         Console.WriteLine("Bot: I'm just a chatbot, but I'm functioning automatically! Thanks for asking.");
                         break;
-                    case "what’s your purpose?":
-                    case "what do you do?":
-                    case "what can i ask you about?":
+                    case "what’s your purpose":
+                    case "what do you do":
+                    case "what can i ask you about":
                         Console.WriteLine("Bot: I educate users about cybersecurity threats and safe online practices.");
+                        break;
+                    case "what is cybersecurity":
+                        Console.WriteLine("Cybersecurity refers to the practice of protecting systems, networks, and data from digital threats, such as hacking, malware, and data breaches.");
+                        break;
+                    case "what is cybersecurity awareness about":
+                        Console.WriteLine("Cybersecurity awareness helps by educating individuals on identifying risks, practicing safe online behaviors (e.g., using strong passwords), and knowing how to respond to potential threats. This reduces the chances of falling victim to cyberattacks and keeps personal and organizational data secure.");
                         break;
                     case "tell me about phishing":
                         Console.WriteLine("Bot: Phishing is a type of cyber attack where attackers trick you into providing personal information via fake emails or websites.");
@@ -129,15 +124,15 @@ namespace Chatbot1
                     case "exit":
                     case "quit":
                     case "end":
-                        running = false;
+                        running = false;  // Set running to false to stop the loop
                         Console.WriteLine("Bot: Goodbye! Stay safe online.");
                         break;
                     default:
+                        // Default case is triggered if the input doesn't match any known question
                         Console.WriteLine("Bot: I’m not sure about that. Try asking me about cybersecurity topics!");
                         break;
                 }
             }
         }
     }
-
 }
