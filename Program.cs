@@ -15,22 +15,34 @@ namespace Chatbot1
 
         static Dictionary<string, string> keywordResponses = new Dictionary<string, string>
         {
-            {"password", "**A strong password should have a combination of capital and lowercase letters, numbers, and symbols\nand be at least 12 characters long...**"},
-            {"phishing", "**Phishing is a kind of cyberattack in which scammers act as trustworthy organisations...**"},
-            {"malware", "**Viruses, worms, Trojan horses, ransomware, and spyware are examples of common malware...**"},
-            {"firewall", "**A firewall is a type of security system that uses set security rules to track and control...**"},
-            {"encryption", "**Data is coded and made unreadable by anyone without the proper decryption key through\nthe process of encryption...**"},
-            {"2fa", "**Before gaining access to an account, users must submit two forms of verification...**"},
-            {"hacking", "**Hacking is the act of breaking into computer networks or systems without authorisation...**"},
-            {"data breach", "**Any unauthorised access, theft, or exposure of private, sensitive, or protected data is a data\nbreach...**"},
-            {"how are you", "**I'm just a chatbot, but I'm here and ready to assist you with cybersecurity knowledge!**"},
-            {"what do you do", "**I am a Cybersecurity Awareness Chatbot, here to educate and assist you with online security topics!**"},
-            {"cybersecurity awareness", "**Cybersecurity awareness refers to the knowledge and practice of protecting personal and organizational digital assets from cyber threats.**"},
-            {"your purpose", "**My purpose is to help you learn about cybersecurity awareness and stay safe online!**"},
-            {"what can I ask you about", "**You can ask me about cybersecurity topics such as cybersecurity awareness, passwords,\nphishing, malware, firewalls, encryption, hacking, and more!**"}
-        };
+    {"password", "**A strong password should have a combination of capital and lowercase letters, numbers,\nand symbols and be at least 12 characters long. Avoid using common words or easily\nguessable information like birthdays. Passwords should be unique for each account,\nand it's best to use a password manager to keep track of them safely.**"},
 
-       
+    {"phishing", "**Phishing is a kind of cyberattack in which scammers act as trustworthy organisations\nto trick individuals into revealing sensitive information such as usernames, passwords,\nor credit card numbers. This is typically done through fake emails, messages, or\nwebsites that appear legitimate.**"},
+
+    {"malware", "**Viruses, worms, Trojan horses, ransomware, and spyware are examples of common\nmalware. These are malicious software programs designed to damage, disrupt, or\nillegally access computer systems. Malware can spread through infected files,\nemail attachments, or harmful websites.**"},
+
+    {"firewall", "**A firewall is a type of security system that uses set security rules to track and control\nincoming and outgoing network traffic. Firewalls act as a barrier between trusted and\nuntrusted networks, helping to block unauthorized access while allowing legitimate\ncommunication.**"},
+
+    {"encryption", "**Data is coded and made unreadable by anyone without the proper decryption key\nthrough the process of encryption. It is a crucial method for protecting sensitive\ninformation during storage or transmission, ensuring privacy and security in\ncommunications.**"},
+
+    {"2fa", "**Before gaining access to an account, users must submit two forms of verification\nwhen using Two-Factor Authentication (2FA). This typically combines something you\nknow (like a password) with something you have (like a phone or security token),\nadding an extra layer of protection.**"},
+
+    {"hacking", "**Hacking is the act of breaking into computer networks or systems without\nauthorisation. Hackers may do this to steal information, disrupt operations, or\nexplore systems. While often illegal, ethical hacking exists to test and improve\nsecurity systems.**"},
+
+    {"data breach", "**Any unauthorised access, theft, or exposure of private, sensitive, or protected data\nis a data breach. This can happen due to poor security practices, successful attacks,\nor accidental leaks, and often results in identity theft or financial loss.**"},
+
+    {"how are you", "**I'm just a chatbot, but I'm here and ready to assist you with cybersecurity\nknowledge!**"},
+
+    {"what do you do", "**I am a Cybersecurity Awareness Chatbot, here to educate and assist you with\nonline security topics!**"},
+
+    {"cybersecurity awareness", "**Cybersecurity awareness refers to the knowledge and practice of protecting personal\nand organizational digital assets from cyber threats. It includes recognizing online\nrisks, using secure tools, and maintaining good security habits.**"},
+
+    {"your purpose", "**My purpose is to help you learn about cybersecurity awareness and stay safe\nonline!**"},
+
+    {"what can I ask you about", "**You can ask me about cybersecurity topics such as cybersecurity awareness,\npasswords, phishing, malware, firewalls, encryption, hacking, and more!**"}
+};
+
+
 
         static void Main()
         {
@@ -64,7 +76,7 @@ namespace Chatbot1
         {
             try
             {
-                SoundPlayer player = new SoundPlayer("Record.wav");
+                SoundPlayer player = new SoundPlayer("Recording.wav");
                 player.Play(); // Plays asynchronously
             }
             catch (Exception)
@@ -129,7 +141,7 @@ namespace Chatbot1
         static void DisplayWelcomeMessage()
         {
             // Set the background and text color for the welcome message
-           
+
             Console.ForegroundColor = ConsoleColor.White;
             int horizontalPadding = (Console.WindowWidth - "== Welcome to the Cybersecurity Awareness Chatbot! ==".Length) / 5;
 
@@ -168,7 +180,7 @@ namespace Chatbot1
             AskHowAreYou();
         }
 
-        
+
         static void AskHowAreYou()
         {
             PrintWithDelay("\nBot: How are you today?", 30);
@@ -190,7 +202,7 @@ namespace Chatbot1
                     string question = Console.ReadLine().ToLower();
                     Console.ForegroundColor = ConsoleColor.Blue; // Bot response blue
 
-                   
+
                     if (keywordResponses.ContainsKey(question))
                     {
                         PrintWithDelay($"Bot: {keywordResponses[question]}", 30);
@@ -201,30 +213,30 @@ namespace Chatbot1
                     }
 
                     string continueAsking = "";
-bool validResponse = false;
+                    bool validResponse = false;
 
-while (!validResponse)
-{
-    PrintWithDelay("\nWould you like to ask anything else? (yes/no)", 30);
-    Console.ForegroundColor = ConsoleColor.Green;
-    continueAsking = Console.ReadLine().ToLower();
+                    while (!validResponse)
+                    {
+                        PrintWithDelay("\nWould you like to ask anything else? (yes/no)", 30);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        continueAsking = Console.ReadLine().ToLower();
 
-    if (continueAsking == "yes")
-    {
-        validResponse = true;
-        // askMore stays true, so continue loop
-    }
-    else if (continueAsking == "no")
-    {
-        validResponse = true;
-        askMore = false; // exit loop
-    }
-    else
-    {
-        Console.ForegroundColor = ConsoleColor.Blue;
-        PrintWithDelay("Bot: Please respond with 'yes' or 'no'.", 30);
-    }
-}
+                        if (continueAsking == "yes")
+                        {
+                            validResponse = true;
+                            // askMore stays true, so continue loop
+                        }
+                        else if (continueAsking == "no")
+                        {
+                            validResponse = true;
+                            askMore = false; // exit loop
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            PrintWithDelay("Bot: Please respond with 'yes' or 'no'.", 30);
+                        }
+                    }
 
                 }
             }
@@ -297,7 +309,7 @@ while (!validResponse)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"🔐 {topic.ToUpper()}");
-                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(keywordResponses[topic]);
                     Console.WriteLine(new string('-', 80));
                 }
@@ -444,4 +456,3 @@ while (!validResponse)
         }
     }
 }
-
