@@ -2,31 +2,70 @@
 using System.Text.RegularExpressions;
 using System.Media;
 using System.Text;
+using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Chatbot1
 {
     class Chatbot
+
     {
+        static List<string> topicHistory = new List<string>();
+
+        static Dictionary<string, string> keywordResponses = new Dictionary<string, string>
+        {
+            {"password", "**A strong password should have a combination of capital and lowercase letters, numbers, and symbols\nand be at least 12 characters long...**"},
+            {"phishing", "**Phishing is a kind of cyberattack in which scammers act as trustworthy organisations...**"},
+            {"malware", "**Viruses, worms, Trojan horses, ransomware, and spyware are examples of common malware...**"},
+            {"firewall", "**A firewall is a type of security system that uses set security rules to track and control...**"},
+            {"encryption", "**Data is coded and made unreadable by anyone without the proper decryption key through\nthe process of encryption...**"},
+            {"2fa", "**Before gaining access to an account, users must submit two forms of verification...**"},
+            {"hacking", "**Hacking is the act of breaking into computer networks or systems without authorisation...**"},
+            {"data breach", "**Any unauthorised access, theft, or exposure of private, sensitive, or protected data is a data\nbreach...**"},
+            {"how are you", "**I'm just a chatbot, but I'm here and ready to assist you with cybersecurity knowledge!**"},
+            {"what do you do", "**I am a Cybersecurity Awareness Chatbot, here to educate and assist you with online security topics!**"},
+            {"cybersecurity awareness", "**Cybersecurity awareness refers to the knowledge and practice of protecting personal and organizational digital assets from cyber threats.**"},
+            {"your purpose", "**My purpose is to help you learn about cybersecurity awareness and stay safe online!**"},
+            {"what can I ask you about", "**You can ask me about cybersecurity topics such as cybersecurity awareness, passwords,\nphishing, malware, firewalls, encryption, hacking, and more!**"}
+        };
+
+       
+
         static void Main()
         {
-            // Set background to white and text to black
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Clear(); // Apply background color to the entire console
+            Console.ForegroundColor = ConsoleColor.Blue;
 
-            Console.OutputEncoding = Encoding.UTF8;
-            PlayVoiceGreeting();
+            MaximizeConsoleWindow();
             DisplayAsciiArt();
+            DisplayWelcomeMessage();
+            PlayVoiceGreeting();
             StartChatbot();
         }
 
-        //Voice greeting method
+        static void MaximizeConsoleWindow()
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                try
+                {
+                    Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
+                    Console.SetBufferSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error maximizing window: " + e.Message);
+                }
+            }
+        }
+
         static void PlayVoiceGreeting()
         {
             try
             {
                 SoundPlayer player = new SoundPlayer("Record.wav");
-                player.Play();
+                player.Play(); // Plays asynchronously
             }
             catch (Exception)
             {
@@ -34,105 +73,375 @@ namespace Chatbot1
             }
         }
 
-        // The Cybersecurity ASCII Logo method
+
         static void DisplayAsciiArt()
         {
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
 
-            // Get console width for centering
-            int consoleWidth = Console.WindowWidth;
-            string[] logoLines = new string[] {
-                "//=================================//",
-                "//   CYBERSECURITY PROTECTION      //",
-                "//=================================//",
-                "//      ┌──────────────────┐       //",
-                "//      │  ████████████    │       //",
-                "//      │  ██      ██  █   │       //",
-                "//      │  ██  ██  ██ ███  │       //",
-                "//      │  ██  ██  ██  █   │       //",
-                "//      │  ████████████    │       //",
-                "//      └──────────────────┘       //",
-                "//    Secure. Encrypt. Defend.     //",
-                "//=================================//"
+            string[] headingLines = {
+                @"   _______  _____      __  ________   ________  _______  ",
+                @"  /// ____|  \\\ \    / / |||  _  \  |||  ____| |||  __ \ ",
+                @" ||| |        \\\ \  / /  ||| |_)  | ||| |__    ||| |__) |",
+                @" ||| |         \\\ \/ /   |||  _  <  |||  __|   |||  _  / ",
+                @" ||| |____      |||  |    ||| |_)  | ||| |____  ||| | \ \ ",
+                @"  \\\_____|     |||__|    |||_____/  |||______| |||_|  \_\",
+                @"                                                ",
+                @"         C Y B E R - S E C U R I T Y             "
             };
 
-            // Calculate padding for centering
-            foreach (string line in logoLines)
+            string[] logoLines = {
+                "||=================================||",
+                "||   CYBERSECURITY PROTECTION      ||",
+                "||=================================||",
+                "||      ┌──────────────────┐       ||",
+                "||      │  ████████████    │       ||",
+                "||      │  ██      ██  █   │       ||",
+                "||      │  ██  ██  ██ ███  │       ||",
+                "||      │  ██  ██  ██  █   │       ||",
+                "||      │  ████████████    │       ||",
+                "||      └──────────────────┘       ||",
+                "||    SECURE. ENCRYPT. DEFEAT.     ||",
+                "||=================================||"
+            };
+
+            int consoleWidth = Console.WindowWidth;
+            int logoWidth = logoLines.Max(line => line.Length);
+            int logoStartPos = consoleWidth - logoWidth;
+            int totalLines = Math.Max(headingLines.Length, logoLines.Length);
+
+            for (int i = 0; i < totalLines; i++)
             {
-                int padding = (consoleWidth - line.Length) / 2;
-                Console.WriteLine(new string(' ', Math.Max(0, padding)) + line);
+                string headingPart = i < headingLines.Length ? headingLines[i] : new string(' ', headingLines[0].Length);
+                string logoPart = i < logoLines.Length ? logoLines[i] : "";
+
+                int spaceBetween = logoStartPos - headingPart.Length;
+                spaceBetween = spaceBetween < 0 ? 0 : spaceBetween;
+
+                Console.WriteLine($"{headingPart}{new string(' ', spaceBetween)}{logoPart}");
             }
 
+            Console.WriteLine("\n");
             Console.ResetColor();
         }
 
-        //Starting the chatbot conversation
-        static void StartChatbot()
+        static void DisplayWelcomeMessage()
         {
-            Console.Write("Hello! What's your name? ");
-            string userName = Console.ReadLine();
-            while (string.IsNullOrWhiteSpace(userName))
-            {
-                Console.Write("Please enter a valid name: ");
-                userName = Console.ReadLine();
-            }
+            // Set the background and text color for the welcome message
+           
+            Console.ForegroundColor = ConsoleColor.White;
+            int horizontalPadding = (Console.WindowWidth - "== Welcome to the Cybersecurity Awareness Chatbot! ==".Length) / 5;
 
-            Console.WriteLine($"\nWelcome, {userName}! I'm your Cybersecurity Awareness Bot. How can I assist you today?");
-            ChatLoop();
+            Console.SetCursorPosition(horizontalPadding, Console.CursorTop);
+            Console.WriteLine("== Welcome to the Cybersecurity Awareness Chatbot! ==");
+            Console.SetCursorPosition(horizontalPadding, Console.CursorTop);
+            Console.WriteLine("-------------------------------------------------------------------------------------------");
+            Console.SetCursorPosition(horizontalPadding, Console.CursorTop);
+            Console.WriteLine("I am here to help you learn about keeping your data safe.");
+            Console.SetCursorPosition(horizontalPadding, Console.CursorTop);
+            Console.WriteLine("Ask me about topics that are cybersecurity related such as: passwords, phishing, and more.");
+            Console.SetCursorPosition(horizontalPadding, Console.CursorTop);
+            Console.WriteLine("-------------------------------------------------------------------------------------------");
+
+            // Reset colors for the conversation text to remove the black background
+            Console.ResetColor();
         }
 
-        // Chatbot loop for user conversation
-        static void ChatLoop()
+
+        static void StartChatbot()
         {
-            bool running = true;
-            while (running)
+            Console.WriteLine("\nWhat is your name? ");
+            Console.ForegroundColor = ConsoleColor.Green; // User input green
+            string userName = Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Blue; // Bot response blue
+
+            while (string.IsNullOrWhiteSpace(userName))
             {
-                Console.Write("\nYou: ");
-                string userInput = Console.ReadLine().ToLower();
+                Console.WriteLine("Please enter a valid name: ");
+                Console.ForegroundColor = ConsoleColor.Green; // User input green
+                userName = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Blue; // Bot response blue
+            }
 
-                // Clean the user input by removing punctuation marks (such as ?, !!!)
-                userInput = Regex.Replace(userInput, @"[^\w\s]", ""); // This removes any character that isn't a word or space
+            PrintWithDelay($"\nWelcome, {userName}! I am your Cybersecurity Awareness Chatbot.", 1);
+            AskHowAreYou();
+        }
 
-                if (string.IsNullOrWhiteSpace(userInput))
+        
+        static void AskHowAreYou()
+        {
+            PrintWithDelay("\nBot: How are you today?", 30);
+            Console.ForegroundColor = ConsoleColor.Green; // User input green
+            string userResponse = Console.ReadLine().ToLower();
+
+            Console.ForegroundColor = ConsoleColor.Blue; // Bot response blue
+            Console.ForegroundColor = ConsoleColor.Green; // User input green
+            if (userResponse.Contains("good") || userResponse.Contains("well") || userResponse.Contains("fine"))
+            {
+                PrintWithDelay("\nBot: Glad to hear that! Do you have any questions for me before we start?", 30);
+
+                bool askMore = true;
+                while (askMore)
                 {
-                    Console.WriteLine("Bot: I didn't quite understand that. Could you rephrase?");
-                    continue;
+                    Console.Write("\nYou: ");
+                    Console.ForegroundColor = ConsoleColor.Green;
+
+                    string question = Console.ReadLine().ToLower();
+                    Console.ForegroundColor = ConsoleColor.Blue; // Bot response blue
+
+                   
+                    if (keywordResponses.ContainsKey(question))
+                    {
+                        PrintWithDelay($"Bot: {keywordResponses[question]}", 30);
+                    }
+                    else
+                    {
+                        PrintWithDelay("Bot: I didn't quite understand that. Could you rephrase?", 30);
+                    }
+
+                    string continueAsking = "";
+bool validResponse = false;
+
+while (!validResponse)
+{
+    PrintWithDelay("\nWould you like to ask anything else? (yes/no)", 30);
+    Console.ForegroundColor = ConsoleColor.Green;
+    continueAsking = Console.ReadLine().ToLower();
+
+    if (continueAsking == "yes")
+    {
+        validResponse = true;
+        // askMore stays true, so continue loop
+    }
+    else if (continueAsking == "no")
+    {
+        validResponse = true;
+        askMore = false; // exit loop
+    }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Blue;
+        PrintWithDelay("Bot: Please respond with 'yes' or 'no'.", 30);
+    }
+}
+
                 }
+            }
 
-                switch (userInput)  // Convert user input to lowercase for case-insensitive comparison
+            DisplayMenu();
+        }
+
+
+        static void DisplayMenu()
+        {
+            bool menuActive = true;
+
+            while (menuActive)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nPlease select an option:");
+                Console.WriteLine("1. Learn about Cybersecurity Topics");
+                Console.WriteLine("2. Exit");
+                Console.WriteLine("3. View History of Learned Topics");
+
+                Console.ForegroundColor = ConsoleColor.Green; // User input green
+                Console.Write("\nEnter the number corresponding to your choice: ");
+                string choice = Console.ReadLine();
+
+                switch (choice)
                 {
-                    case "how are you":
-                        Console.WriteLine("Bot: I'm just a chatbot, but I'm functioning automatically! Thanks for asking.");
+                    case "1":
+                        DisplayTopics();
                         break;
-                    case "what’s your purpose":
-                    case "what do you do":
-                    case "what can i ask you about":
-                        Console.WriteLine("Bot: I educate users about cybersecurity threats and safe online practices.");
+                    case "2":
+                        PrintWithDelay("Bot: You have chosen to exit. Goodbye and stay safe online!", 50);
+                        menuActive = false;
                         break;
-                    case "what is cybersecurity":
-                        Console.WriteLine("Cybersecurity refers to the practice of protecting systems, networks, and data from digital threats, such as hacking, malware, and data breaches.");
+                    case "3":
+                        DisplayHistory();
                         break;
-                    case "what is cybersecurity awareness about":
-                        Console.WriteLine("Cybersecurity awareness helps by educating individuals on identifying risks, practicing safe online behaviors (e.g., using strong passwords), and knowing how to respond to potential threats. This reduces the chances of falling victim to cyberattacks and keeps personal and organizational data secure.");
+                    case "4":
+                        PrintWithDelay("Bot: I am a Cybersecurity Awareness Chatbot, here to educate you about cybersecurity and protect your online safety.", 30);
                         break;
-                    case "tell me about phishing":
-                        Console.WriteLine("Bot: Phishing is a type of cyber attack where attackers trick you into providing personal information via fake emails or websites.");
-                        break;
-                    case "how do i create a strong password":
-                        Console.WriteLine("Bot: A strong password should have at least 12 characters, including letters, numbers, and special symbols.");
-                        break;
-                    case "exit":
-                    case "quit":
-                    case "end":
-                        running = false;  // Set running to false to stop the loop
-                        Console.WriteLine("Bot: Goodbye! Stay safe online.");
+                    case "5":
+                        PrintWithDelay("Goodbye! Stay safe online.", 30);
+                        menuActive = false;
                         break;
                     default:
-                        // Default case is triggered if the input doesn't match any known question
-                        Console.WriteLine("Bot: I’m not sure about that. Try asking me about cybersecurity topics!");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Invalid choice. Please enter a valid number.");
+                        Console.ForegroundColor = ConsoleColor.DarkBlue;
                         break;
+                }
+            }
+
+            Console.Clear();
+            Environment.Exit(0);
+        }
+
+        static void DisplayHistory()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
+
+            if (topicHistory.Count == 0)
+            {
+                Console.WriteLine("No topics have been viewed yet.");
+            }
+            else
+            {
+                Console.WriteLine("Previously viewed topics:\n");
+
+                foreach (string topic in topicHistory)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"🔐 {topic.ToUpper()}");
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    Console.WriteLine(keywordResponses[topic]);
+                    Console.WriteLine(new string('-', 80));
+                }
+            }
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMenu();
+        }
+
+
+        static void DisplayTopics()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.White;
+
+            Console.WriteLine("Here are some topics you can learn about:");
+            Console.WriteLine("1. Password Security");
+            Console.WriteLine("2. Phishing Scams");
+            Console.WriteLine("3. Malware");
+            Console.WriteLine("4. Firewalls");
+            Console.WriteLine("5. Encryption");
+            Console.WriteLine("6. Two-Factor Authentication (2FA)");
+            Console.WriteLine("7. Hacking");
+            Console.WriteLine("8. Data Breaches");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("\nEnter the number of the topic you'd like to learn about (or '0' to return to the main menu): ");
+            string topicChoice = Console.ReadLine();
+
+            switch (topicChoice)
+            {
+                case "1":
+                    DisplayTopicInfo("password");
+                    break;
+                case "2":
+                    DisplayTopicInfo("phishing");
+                    break;
+                case "3":
+                    DisplayTopicInfo("malware");
+                    break;
+                case "4":
+                    DisplayTopicInfo("firewall");
+                    break;
+                case "5":
+                    DisplayTopicInfo("encryption");
+                    break;
+                case "6":
+                    DisplayTopicInfo("2fa");
+                    break;
+                case "7":
+                    DisplayTopicInfo("hacking");
+                    break;
+                case "8":
+                    DisplayTopicInfo("data breach");
+                    break;
+                case "0":
+                    DisplayMenu();
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Invalid choice. Please enter a number from 1 to 8, or '0' to return.");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+            }
+        }
+
+        static void DisplayTopicInfo(string topic)
+        {
+            // Display information about the selected topic
+            if (keywordResponses.ContainsKey(topic))
+            {
+                // Add to history if not already there
+                if (!topicHistory.Contains(topic))
+                {
+                    topicHistory.Add(topic);
+                }
+
+                PrintWithDelay($"Bot: {keywordResponses[topic]}", 30);
+            }
+            else
+            {
+                PrintWithDelay("Bot: I don't have information on that topic right now.", 30);
+            }
+
+            // After showing the information, return to the topic list
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\nEnter any key to return to the topics list...");
+            Console.ReadKey();
+            DisplayTopics();
+        }
+
+        static void ViewHistory()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("History of Topics You've Learned:");
+
+            if (topicHistory.Count == 0)
+            {
+                Console.WriteLine("No topics have been viewed yet.");
+            }
+            else
+            {
+                foreach (string topic in topicHistory)
+                {
+                    Console.WriteLine("- " + topic);
+                }
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+        }
+
+        static void PrintWithDelay(string message, int delay)
+        {
+            message = message.Replace("cybersecurity", "CYBERSECURITY");
+            foreach (char c in message)
+            {
+                Console.Write(c);
+                Thread.Sleep(delay);
+            }
+            Console.WriteLine();
+        }
+
+        static void MatrixEffectAtEnd()
+        {
+            Random rand = new Random();
+            int delayTime = 1;
+            DateTime startTime = DateTime.Now;
+            TimeSpan duration = TimeSpan.FromSeconds(3);
+
+            while (DateTime.Now - startTime < duration)
+            {
+                for (int i = 0; i < Console.WindowHeight; i++)
+                {
+                    Console.SetCursorPosition(rand.Next(Console.WindowWidth), rand.Next(Console.WindowHeight));
+                    Console.Write((char)rand.Next(48, 58));
+                    Thread.Sleep(delayTime);
                 }
             }
         }
     }
 }
+
